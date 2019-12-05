@@ -1,0 +1,32 @@
+{% extends 'conjugator/base.html' %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="alert alert-primary">
+        <h4>Welcome!</h4>
+        <p>Below is the list of the 100 most commonly used German verbs according to
+          <a href="https://www.amazon.com/Frequency-Dictionary-German-Vocabulary-Dictionaries/dp/0415316332">A Frequency Dictionary of German</a>. Select any verb to see its conjugation pattern.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="row no-gutters">
+    {% for col in col_list %}
+      <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+        <ul>
+        {% for verb in col %}
+          <li>
+            <span class="badge">{{ verb.frequency }}</span>
+            <a href="#">{{ verb }}</a>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}
