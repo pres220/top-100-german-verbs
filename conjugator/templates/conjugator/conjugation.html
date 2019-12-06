@@ -1,0 +1,135 @@
+{% extends 'conjugator/base.html' %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<div class="container conjugation-container">
+  <h4 class="conjugation-header">Conjugation for '{{ verb.infinitive }}'</h4>
+  <h6>Click here to return <a href="{% url 'home' %}">Home</a></h6>
+  <div class="row">
+    <div class="col-sm-6 col-md-4">
+      <table class="table table-bordered">
+        <thead class="thead text-white bg-info">
+          <tr>
+            <th colspan="2">Translation</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ verb.infinitive }}</td>
+              <td>{{ verb.translation }}</td>
+            </tr>
+          </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-6 col-md-4">
+      <table class="table table-bordered table-hover">
+        <thead class="thead text-white bg-info">
+          <tr>
+            <th colspan="2">Present Tense</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>ich</th>
+            <td>{{ verb.present_ich }}</td>
+          </tr>
+          <tr>
+            <th>du</th>
+            <td>{{ verb.present_du }}</td>
+          </tr>
+          <tr>
+            <th>er/sie/es</th>
+            <td>{{ verb.present_er }}</td>
+          </tr>
+          <tr>
+            <th>wir</th>
+            <td>{{ verb.present_wir }}</td>
+          </tr>
+          <tr>
+            <th>ihr</th>
+            <td>{{ verb.present_ihr }}</td>
+          </tr>
+          <tr>
+            <th>sie/Sie</th>
+            <td>{{ verb.present_sie }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-6 col-md-4">
+      <table class="table table-bordered table-hover">
+        <thead class="thead text-white bg-info">
+          <tr>
+            <th colspan="2">Present Perfect Tense</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>ich</th>
+            <td>{{ verb.perfect_ich }}</td>
+          </tr>
+          <tr>
+            <th>du</th>
+            <td>{{ verb.perfect_du }}</td>
+          </tr>
+          <tr>
+            <th>er/sie/es</th>
+            <td>{{ verb.perfect_er }}</td>
+          </tr>
+          <tr>
+            <th>wir</th>
+            <td>{{ verb.perfect_wir }}</td>
+          </tr>
+          <tr>
+            <th>ihr</th>
+            <td>{{ verb.perfect_ihr }}</td>
+          </tr>
+          <tr>
+            <th>sie/Sie</th>
+            <td>{{ verb.perfect_sie }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-6 col-md-4">
+      <table class="table table-bordered table-hover">
+        <thead class="thead text-white bg-info">
+          <tr>
+            <th colspan="2">Simple Past Tense</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>ich</th>
+            <td>{{ verb.past_ich }}</td>
+          </tr>
+          <tr>
+            <th>du</th>
+            <td>{{ verb.past_du }}</td>
+          </tr>
+          <tr>
+            <th>er/sie/es</th>
+            <td>{{ verb.past_er }}</td>
+          </tr>
+          <tr>
+            <th>wir</th>
+            <td>{{ verb.past_wir }}</td>
+          </tr>
+          <tr>
+            <th>ihr</th>
+            <td>{{ verb.past_ihr }}</td>
+          </tr>
+          <tr>
+            <th>sie/Sie</th>
+            <td>{{ verb.past_sie }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}

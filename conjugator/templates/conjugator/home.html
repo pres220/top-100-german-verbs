@@ -21,7 +21,7 @@
         {% for verb in col %}
           <li>
             <span class="badge">{{ verb.frequency }}</span>
-            <a href="#">{{ verb }}</a>
+            <a href="{% url 'conjugation' verb.infinitive %}">{{ verb.infinitive }}</a>
           </li>
         {% endfor %}
         </ul>
