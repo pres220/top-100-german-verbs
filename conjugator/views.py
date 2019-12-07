@@ -1,9 +1,8 @@
-from urllib import parse
 from django.shortcuts import render, get_object_or_404
 from .models import Verb
 
 def home(request):
-    verb_list = Verb.objects.order_by('frequency')
+    verb_list = Verb.objects.order_by('frequency').values('infinitive', 'frequency')
     verb_list_length = verb_list.count()
     col_list = []
     col_length = 10 if verb_list_length >= 10 else verb_list_length
