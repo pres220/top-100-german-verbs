@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Verb
+from .models import Verb, Conjugation
 
 def home(request):
     verb_list = Verb.objects.order_by('frequency').values('infinitive', 'frequency')
@@ -24,8 +24,38 @@ def home(request):
 
 def conjugation(request, infinitive):
     verb = get_object_or_404(Verb, infinitive__iexact=infinitive)
+    conjugations = Conjugation.objects.filter(infinitive=verb)
+    indicative_present = conjugations.get(mood__name='indicative', tense__name='present')
+    indicative_perfect = conjugations.get(mood__name='indicative', tense__name='perfect')
+    indicative_preterite = conjugations.get(mood__name='indicative', tense__name='preterite')
+    indicative_plusquamperfect = conjugations.get(mood__name='indicative', tense__name='plusquamperfect')
+    indicative_future = conjugations.get(mood__name='indicative', tense__name='future')
+    indicative_future_perfect = conjugations.get(mood__name='indicative', tense__name='future perfect')
+    subjunctive_I_present = conjugations.get(mood__name='subjunctive I', tense__name='present')
+    subjunctive_I_perfect = conjugations.get(mood__name='subjunctive I', tense__name='perfect')
+    subjunctive_I_future = conjugations.get(mood__name='subjunctive I', tense__name='future')
+    subjunctive_I_future_perfect = conjugations.get(mood__name='subjunctive I', tense__name='future perfect')
+    subjunctive_II_preterite = conjugations.get(mood__name='subjunctive II', tense__name='preterite')
+    subjunctive_II_plusquamperfect = conjugations.get(mood__name='subjunctive II', tense__name='plusquamperfect')
+    subjunctive_II_future = conjugations.get(mood__name='subjunctive II', tense__name='future')
+    subjunctive_II_future_perfect = conjugations.get(mood__name='subjunctive II', tense__name='future perfect')
     context = {
         'verb': verb,
+        'conjugations': conjugations,
+        'indicative_present': indicative_present,
+        'indicative_perfect': indicative_perfect,
+        'indicative_preterite': indicative_preterite,
+        'indicative_plusquamperfect': indicative_plusquamperfect,
+        'indicative_future': indicative_future,
+        'indicative_future_perfect': indicative_future_perfect,
+        'subjunctive_I_present': subjunctive_I_present,
+        'subjunctive_I_perfect': subjunctive_I_perfect,
+        'subjunctive_I_future': subjunctive_I_future,
+        'subjunctive_I_future_perfect': subjunctive_I_future_perfect,
+        'subjunctive_II_preterite': subjunctive_II_preterite,
+        'subjunctive_II_plusquamperfect': subjunctive_II_plusquamperfect,
+        'subjunctive_II_future': subjunctive_II_future,
+        'subjunctive_II_future_perfect': subjunctive_II_future_perfect,
         'page_title': f'{verb.infinitive} conjugated'
     }
     return render(request, 'conjugator/conjugation.html', context)

@@ -13,17 +13,17 @@ class Verb(models.Model):
 
 
 class Mood(models.Model):
-    mood = models.CharField(primary_key=True, max_length=30)
+    name = models.CharField(primary_key=True, max_length=30)
 
     def __str__(self):
-        return self.mood
+        return self.name
 
 
 class Tense(models.Model):
-    tense = models.CharField(primary_key=True, max_length=30)
+    name = models.CharField(primary_key=True, max_length=30)
 
     def __str__(self):
-        return self.tense
+        return self.name
 
 
 class Conjugation(models.Model):
