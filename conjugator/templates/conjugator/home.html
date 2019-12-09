@@ -4,15 +4,12 @@
 
 {% block content %}
 <div class="container">
-  <div class="row">
-    <div class="col">
-      <div class="alert alert-primary">
-        <h4>Welcome!</h4>
-        <p>Below is the list of the 100 most commonly used German verbs according to
-          <a href="https://www.amazon.com/Frequency-Dictionary-German-Vocabulary-Dictionaries/dp/0415316332">A Frequency Dictionary of German</a>. Select any verb to see its conjugation pattern.
-        </p>
-      </div>
-    </div>
+  <div class="jumbotron">
+    <h4 class="display-5">Welcome to Top 100 German Verbs!</h4>
+    <hr>
+    <p>Below is the list of the 100 most commonly used German verbs according to
+      <a class="alert-link" href="https://www.amazon.com/Frequency-Dictionary-German-Vocabulary-Dictionaries/dp/0415316332">A Frequency Dictionary of German</a>. Select any verb to see its conjugation pattern.
+    </p>
   </div>
   <div class="row no-gutters">
     {% for col in col_list %}
@@ -21,7 +18,7 @@
         {% for verb in col %}
           <li>
             <span class="badge">{{ verb.frequency }}</span>
-            <a href="{% url 'conjugation' verb.infinitive %}">{{ verb.infinitive }}</a>
+            <a class="alert-link" href="{% url 'conjugation' verb.infinitive %}">{{ verb.infinitive }}</a>
           </li>
         {% endfor %}
         </ul>
