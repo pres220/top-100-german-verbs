@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Verb, Conjugation
 
 def home(request):
@@ -59,3 +59,19 @@ def conjugation(request, infinitive):
         'page_title': f'{verb.infinitive} conjugated'
     }
     return render(request, 'conjugator/conjugation.html', context)
+
+
+def search(request):
+    search_query = request.GET.get('q')
+    if search_query:
+        result = Verb.objects.filter(infinitive__iexact=search_query).first()
+        if result:
+            return redirect(f'/verb/{result.pk}/')
+        else:
+            context = {
+                'search_query': search_query,
+                'page_title': 'Search results'
+            }
+            return render(request, 'conjugate/search_result.html', context)
+    else:
+        return redirect('/')
