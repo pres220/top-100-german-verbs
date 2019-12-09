@@ -1,0 +1,28 @@
+body {
+  background-color: #fafaff;
+}
+
+.card {
+  margin-bottom: 20px;
+  background-color: #fafaff;
+}
+
+
+/*
+.conjugation-container {
+  max-width: 970px;
+}
+*/
+
+.conjugation-header {
+  margin-bottom: 20px;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
+
+ul {
+  list-style-type: none;
+}
+
