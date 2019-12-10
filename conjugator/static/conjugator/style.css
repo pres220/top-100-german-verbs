@@ -7,19 +7,16 @@ body {
   background-color: #fafaff;
 }
 
-
-/*
-.conjugation-container {
-  max-width: 970px;
-}
-*/
-
 .conjugation-header {
   margin-bottom: 20px;
 }
 
 .navbar {
   margin-bottom: 20px;
+}
+
+.result-msg {
+  margin-top: 50px;
 }
 
 ul {

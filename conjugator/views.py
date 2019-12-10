@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Verb, Conjugation
+from django.db import connection
 
 def home(request):
     verb_list = Verb.objects.order_by('frequency').values('infinitive', 'frequency')
@@ -24,6 +25,8 @@ def home(request):
 
 def conjugation(request, infinitive):
     verb = get_object_or_404(Verb, infinitive__iexact=infinitive)
+    next_verb = Verb.objects.get(frequency=(verb.frequency + 1 if verb.frequency < 100 else 1))
+    prev_verb = Verb.objects.get(frequency=(verb.frequency - 1 if verb.frequency > 1 else 100))
     conjugations = Conjugation.objects.filter(infinitive=verb)
     indicative_present = conjugations.get(mood__name='indicative', tense__name='present')
     indicative_perfect = conjugations.get(mood__name='indicative', tense__name='perfect')
@@ -40,8 +43,10 @@ def conjugation(request, infinitive):
     subjunctive_II_future = conjugations.get(mood__name='subjunctive II', tense__name='future')
     subjunctive_II_future_perfect = conjugations.get(mood__name='subjunctive II', tense__name='future perfect')
     context = {
+        'queries': connection.queries,
         'verb': verb,
-        'conjugations': conjugations,
+        'next_verb': next_verb,
+        'prev_verb': prev_verb,
         'indicative_present': indicative_present,
         'indicative_perfect': indicative_perfect,
         'indicative_preterite': indicative_preterite,
@@ -72,6 +77,6 @@ def search(request):
                 'search_query': search_query,
                 'page_title': 'Search results'
             }
-            return render(request, 'conjugate/search_result.html', context)
+            return render(request, 'conjugator/search_result.html', context)
     else:
         return redirect('/')

@@ -26,6 +26,8 @@
         <input id="search" class="form-control ml-sm-2 mr-sm-2" name="q" type="search" placeholder="Search" required>
         <input class="btn btn-light my-2 my-sm-0" type="submit">
       </form>
+      {% block button %}
+      {% endblock button%}
     </nav>
     {% block content %}
     {% endblock content %}
