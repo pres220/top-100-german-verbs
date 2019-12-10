@@ -6,10 +6,10 @@
 {% endblock title %}
 
 {% block button %}
-<a href="{% url 'conjugation' prev_verb.infinitive %}">
+<a href="{% url 'conjugation' prev_verb %}">
   <button class="btn btn-light ml-sm-2 my-2 my-sm-0">&laquo; Prev</button>
 </a>
-<a href="{% url 'conjugation' next_verb.infinitive %}">
+<a href="{% url 'conjugation' next_verb %}">
   <button class="btn btn-light ml-sm-2 my-2 my-sm-0">Next &raquo;</button>
 </a>
 {% endblock button %}
@@ -31,26 +31,6 @@
               <tbody>
                 <tr>
                   <td>{{ verb.infinitive }}</td>
-                </tr>
-              </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-xl">
-          <table class="table table-bordered">
-            <thead class="thead-dark">
-              <tr>
-                <th>Frequency</th>
-              </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    {% if verb.frequency == 1 %}
-                      Most common verb
-                    {% else %}
-                      {{ verb.frequency | ordinal }} most common
-                    {% endif %}
-                  </td>
                 </tr>
               </tbody>
           </table>
@@ -93,6 +73,22 @@
               <tbody>
                 <tr>
                   <td>{{ verb.past_participle }}</td>
+                </tr>
+              </tbody>
+          </table>
+        </div>
+        <div class="col-sm-6 col-xl">
+          <table class="table table-bordered">
+            <thead class="thead-dark">
+              <tr>
+                <th>Frequency Rank</th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    {{ verb.frequency | ordinal }}
+                  </td>
                 </tr>
               </tbody>
           </table>

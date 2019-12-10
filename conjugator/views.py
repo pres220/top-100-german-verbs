@@ -19,14 +19,15 @@ def home(request):
 
     context = {
         'col_list': col_list,
-        'page_title': 'Top 100 German Verbs'
+        'page_title': 'Top 100 German Verbs',
+        'brand': 'Top 100 German Verbs'
     }
     return render(request, 'conjugator/home.html', context)
 
 def conjugation(request, infinitive):
     verb = get_object_or_404(Verb, infinitive__iexact=infinitive)
-    next_verb = Verb.objects.get(frequency=(verb.frequency + 1 if verb.frequency < 100 else 1))
-    prev_verb = Verb.objects.get(frequency=(verb.frequency - 1 if verb.frequency > 1 else 100))
+    next_verb = Verb.objects.get(frequency=(verb.frequency + 1 if verb.frequency < 100 else 1)).infinitive
+    prev_verb = Verb.objects.get(frequency=(verb.frequency - 1 if verb.frequency > 1 else 100)).infinitive
     conjugations = Conjugation.objects.filter(infinitive=verb)
     indicative_present = conjugations.get(mood__name='indicative', tense__name='present')
     indicative_perfect = conjugations.get(mood__name='indicative', tense__name='perfect')
@@ -42,8 +43,8 @@ def conjugation(request, infinitive):
     subjunctive_II_plusquamperfect = conjugations.get(mood__name='subjunctive II', tense__name='plusquamperfect')
     subjunctive_II_future = conjugations.get(mood__name='subjunctive II', tense__name='future')
     subjunctive_II_future_perfect = conjugations.get(mood__name='subjunctive II', tense__name='future perfect')
+
     context = {
-        'queries': connection.queries,
         'verb': verb,
         'next_verb': next_verb,
         'prev_verb': prev_verb,
@@ -61,7 +62,7 @@ def conjugation(request, infinitive):
         'subjunctive_II_plusquamperfect': subjunctive_II_plusquamperfect,
         'subjunctive_II_future': subjunctive_II_future,
         'subjunctive_II_future_perfect': subjunctive_II_future_perfect,
-        'page_title': f'{verb.infinitive} conjugated'
+        'page_title': f'{verb.infinitive} conjugation | Top 100 German Verbs'
     }
     return render(request, 'conjugator/conjugation.html', context)
 
@@ -75,7 +76,7 @@ def search(request):
         else:
             context = {
                 'search_query': search_query,
-                'page_title': 'Search results'
+                'page_title': 'Search failed | Top 100 German Verbs'
             }
             return render(request, 'conjugator/search_result.html', context)
     else:

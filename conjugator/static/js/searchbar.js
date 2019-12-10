@@ -6,3 +6,7 @@ document.querySelector('.search-bar').addEventListener('click', (e) => {
       inputEl.focus();
   }
 });
+
+document.querySelector('.navbar-toggler').addEventListener('click', () => {
+  document.querySelector("#navbarNav").classList.toggle('collapse');
+});

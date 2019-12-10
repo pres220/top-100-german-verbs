@@ -14,20 +14,25 @@
     </title>
   </head>
   <body>
-    <nav class="navbar navbar-dark bg-info">
-      <a class="navbar-brand" href="{% url 'home' %}">Home</a>
-      <div class="search-bar ml-auto">
-        <button class="letter btn btn-light">ä</button>
-        <button class="letter btn btn-light">ö</button>
-        <button class="letter btn btn-light">ü</button>
-        <button class="letter btn btn-light">ß</button>
-      </div>
-      <form class="form-inline" action="{% url 'search' %}" method="get">
-        <input id="search" class="form-control ml-sm-2 mr-sm-2" name="q" type="search" placeholder="Search" required>
-        <input class="btn btn-light my-2 my-sm-0" type="submit">
-      </form>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-info">
+      <a class="navbar-brand" href="{% url 'home' %}">{% block brand %}{{ brand|default:'Home'}}{% endblock brand %}</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="search-bar ml-auto">
+          <button class="letter btn btn-light">ä</button>
+          <button class="letter btn btn-light">ö</button>
+          <button class="letter btn btn-light">ü</button>
+          <button class="letter btn btn-light">ß</button>
+        </div>
+        <form class="form-inline" action="{% url 'search' %}" method="get">
+          <input id="search" class="form-control my-2 ml-sm-2 mr-sm-2" name="q" type="search" required>
+          <input class="btn btn-light" type="submit" value="Search">
+        </form>
       {% block button %}
       {% endblock button%}
+      </div>
     </nav>
     {% block content %}
     {% endblock content %}
