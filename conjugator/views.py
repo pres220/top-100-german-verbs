@@ -26,8 +26,10 @@ def home(request):
 
 def conjugation(request, infinitive):
     verb = get_object_or_404(Verb, infinitive__iexact=infinitive)
-    next_verb = Verb.objects.get(frequency=(verb.frequency + 1 if verb.frequency < 100 else 1)).infinitive
-    prev_verb = Verb.objects.get(frequency=(verb.frequency - 1 if verb.frequency > 1 else 100)).infinitive
+    next_frequency = verb.frequency + 1 if verb.frequency < Verb.objects.count() else 1
+    prev_frequency = verb.frequency - 1 if verb.frequency > 1 else Verb.objects.count()
+    next_verb = Verb.objects.get(frequency=next_frequency).infinitive
+    prev_verb = Verb.objects.get(frequency=prev_frequency).infinitive
     conjugations = Conjugation.objects.filter(infinitive=verb)
     indicative_present = conjugations.get(mood__name='indicative', tense__name='present')
     indicative_perfect = conjugations.get(mood__name='indicative', tense__name='perfect')
