@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Verb, Conjugation
-from django.db import connection
+from django.http import JsonResponse
+
 
 def home(request):
     verb_list = Verb.objects.order_by('frequency').values('infinitive', 'frequency')
@@ -23,6 +24,7 @@ def home(request):
         'brand': 'Top 100 German Verbs'
     }
     return render(request, 'conjugator/home.html', context)
+
 
 def conjugation(request, infinitive):
     verb = get_object_or_404(Verb, infinitive__iexact=infinitive)
@@ -83,3 +85,9 @@ def search(request):
             return render(request, 'conjugator/search_result.html', context)
     else:
         return redirect('/')
+
+
+def autocomplete(request):
+    raw_verb_list = Verb.objects.order_by('frequency').values('infinitive')
+    verb_list = [verb['infinitive'] for verb in raw_verb_list]
+    return JsonResponse(verb_list, safe=False)
