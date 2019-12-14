@@ -1,4 +1,4 @@
-document.querySelector('.search-bar').addEventListener('click', (e) => {
+document.querySelector('.search-bar').addEventListener('mousedown', (e) => {
   if (e.target.classList.contains('letter')) {
       e.preventDefault();
       const inputEl = document.querySelector('#search');
@@ -11,9 +11,6 @@ document.querySelector('.navbar-toggler').addEventListener('click', () => {
   document.querySelector("#navbarNav").classList.toggle('collapse');
 });
 
-function getMatches(term, verbList) {
-    return verbList.filter(verb => verb.includes(term.toLowerCase()));
-}
 
 const verbAutoComplete = new autoComplete({
     selector: 'input[id="search"]',
@@ -24,7 +21,8 @@ const verbAutoComplete = new autoComplete({
         xhr.responseType = 'json';
         xhr.onreadystatechange = function() {
             if (this.readyState === 4 && this.status === 200) {
-                suggest(getMatches(term, xhr.response));
+                matches = this.response.filter(verb => verb.includes(term.toLowerCase()));
+                suggest(matches);
             }
         }
         xhr.send();

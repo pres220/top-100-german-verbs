@@ -72,22 +72,22 @@ def conjugation(request, infinitive):
 
 
 def search(request):
-    search_query = request.GET.get('q')
+    search_query = request.GET['q']
     if search_query:
-        result = Verb.objects.filter(infinitive__iexact=search_query).first()
-        if result:
-            return redirect(f'/verb/{result.pk}/')
-        else:
+        try:
+            verb = Verb.objects.get(infinitive__iexact=search_query)
+        except Verb.DoesNotExist:
             context = {
                 'search_query': search_query,
                 'page_title': 'Search failed | Top 100 German Verbs'
             }
             return render(request, 'conjugator/search_result.html', context)
+        return redirect(f'/verb/{verb.infinitive}/')
     else:
         return redirect('/')
 
 
 def autocomplete(request):
-    raw_verb_list = Verb.objects.order_by('frequency').values('infinitive')
-    verb_list = [verb['infinitive'] for verb in raw_verb_list]
-    return JsonResponse(verb_list, safe=False)
+    verb_list = Verb.objects.order_by('frequency').values('infinitive')
+    autocomplete_list = [verb['infinitive'] for verb in verb_list]
+    return JsonResponse(autocomplete_list, safe=False)
