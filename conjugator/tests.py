@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.db.utils import IntegrityError
+from django.urls import reverse
 from .models import Verb, Mood, Tense, Conjugation
 
 
@@ -16,6 +17,8 @@ class VerbModelTest(TestCase):
 
     def test_fields(self):
         verb = Verb.objects.get(infinitive='test_infinitive')
+        self.assertTrue(isinstance(verb, Verb))
+        self.assertEqual(verb.__str__(), verb.infinitive)
         self.assertEqual(verb.infinitive, 'test_infinitive')
         self.assertEqual(verb.frequency, 1)
         self.assertEqual(verb.translation, 'test_translation')
@@ -30,6 +33,8 @@ class MoodModelTest(TestCase):
 
     def test_name(self):
         mood = Mood.objects.get(name='test_name')
+        self.assertTrue(isinstance(mood, Mood))
+        self.assertEqual(mood.__str__(), mood.name)
         self.assertEqual(mood.name, 'test_name')
 
 
@@ -40,6 +45,8 @@ class TenseModelTest(TestCase):
 
     def test_name(self):
         tense = Tense.objects.get(name='test_name')
+        self.assertTrue(isinstance(tense, Tense))
+        self.assertEqual(tense.__str__(), tense.name)
         self.assertEqual(tense.name, 'test_name')
 
 
@@ -53,8 +60,10 @@ class ConjugationModelTest(TestCase):
             present_participle='test_present_participle',
             past_participle='test_past_participle',
         )
+
         mood = Mood.objects.create(name='test_mood')
         tense = Tense.objects.create(name='test_tense')
+
         Conjugation.objects.create(
             infinitive=verb,
             mood=mood,
@@ -69,6 +78,9 @@ class ConjugationModelTest(TestCase):
 
     def test_fields(self):
         conjugation = Conjugation.objects.get(pk=1)
+        self.assertTrue(isinstance(conjugation, Conjugation))
+        self.assertEqual(conjugation.__str__(),
+            f'{conjugation.infinitive.infinitive} {conjugation.mood.name} {conjugation.tense.name}')
         self.assertEqual(conjugation.infinitive.infinitive, 'test_infinitive')
         self.assertEqual(conjugation.mood.name, 'test_mood')
         self.assertEqual(conjugation.tense.name, 'test_tense')
@@ -97,28 +109,41 @@ class ConjugationModelTest(TestCase):
             )
 
 
-class HomepageTest(TestCase):
+class HomeViewTest(TestCase):
+
+    def setUp(self):
+        for i in range(1, 12):
+            Verb.objects.create(
+                infinitive=f'test_infinitive{i}',
+                frequency=i,
+            )
+
+    def test_home_page(self):
+        response = self.client.get(reverse('home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'conjugator/home.html')
+        for i in range(1, 12):
+            self.assertContains(response, f'test_infinitive{i}')
+
+
+class AutocompleteViewTest(TestCase):
 
     def setUp(self):
         for i in range(1, 101):
             Verb.objects.create(
                 infinitive=f'test_infinitive{i}',
                 frequency=i,
-                translation='test_translation',
-                present_participle='test_present_participle',
-                past_participle='test_past_participle',
             )
 
-    def test_home_page(self):
-        response = self.client.get('/')
+    def test_autocomplete_json(self):
+        response = self.client.get(reverse('autocomplete'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'conjugator/home.html')
-        self.assertNotContains(response, 'blubbery-blobbery')
+        self.assertEqual(len(response.json()), Verb.objects.count())
         for i in range(1, 101):
-            self.assertContains(response, f'test_infinitive{i}')
+            self.assertEqual(response.json()[i-1], f'test_infinitive{i}')
 
 
-class DetailPageTest(TestCase):
+class ConjugationViewTest(TestCase):
 
     def setUp(self):
         verb = Verb.objects.create(
@@ -308,13 +333,20 @@ class DetailPageTest(TestCase):
             sie='subjunctive_II_future_perfect_sie'
         )
 
-    def test_detail_page(self):
-        response = self.client.get('/verb/test_infinitive/')
-        no_response = self.client.get('/verb/blubbery-blobbery/')
-        self.assertEqual(response.status_code, 200)
+    def test_detail_page_not_created_for_nonexisting_verb(self):
+        url = reverse('conjugation', kwargs={'infinitive':'does_not_exist'})
+        no_response = self.client.get(url)
         self.assertEqual(no_response.status_code, 404)
+
+    def test_detail_page_created_for_existing_verb(self):
+        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'conjugator/conjugation.html')
 
+    def test_detail_page_contains_conjugation(self):
+        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
+        response = self.client.get(url)
         self.assertContains(response, 'test_infinitive')
         self.assertContains(response, '1st')
         self.assertContains(response, 'test_translation')
@@ -418,3 +450,29 @@ class DetailPageTest(TestCase):
         self.assertContains(response, 'subjunctive_II_future_perfect_wir')
         self.assertContains(response, 'subjunctive_II_future_perfect_ihr')
         self.assertContains(response, 'subjunctive_II_future_perfect_sie')
+
+
+class SearchViewTest(ConjugationViewTest):
+
+    def test_empty_search_query_redirect(self):
+        response = self.client.get(reverse('search'), {'q':''} )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('home'))
+
+    def test_lowercase_search_query_redirect(self):
+        response = self.client.get(reverse('search'), {'q':'test_infinitive'})
+        self.assertEqual(response.status_code, 302)
+        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
+        self.assertRedirects(response, url)
+
+    def test_nonlowercase_search_query_redirect(self):
+        response = self.client.get(reverse('search'), {'q':'Test_Infinitive'})
+        self.assertEqual(response.status_code, 302)
+        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
+        self.assertRedirects(response, url)
+
+    def test_search_query_does_not_exist(self):
+        response = self.client.get(reverse('search'), {'q':'does_not_exist'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'conjugator/search_result.html')
+        self.assertContains(response, 'does_not_exist')
