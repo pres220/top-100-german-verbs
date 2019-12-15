@@ -1,23 +1,13 @@
-from .models import Verb, Conjugation
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.urls import reverse
+from .models import Verb, Conjugation
 
 
 def home(request):
-    verb_list = Verb.objects.order_by('frequency').values('infinitive', 'frequency')
-    verb_list_length = verb_list.count()
-    col_list = []
-    col_length = 10 if verb_list_length >= 10 else verb_list_length
-
-    for i in range(0, verb_list_length, col_length):
-        new_col = []
-        for j in range(i, i + col_length):
-            try:
-                new_col.append(verb_list[j])
-            except IndexError:
-                break
-        col_list.append(new_col)
+    verbs = Verb.objects.values('infinitive', 'frequency')
+    col_size = 10
+    col_list = [verbs[i: i+col_size] for i in range(0, verbs.count(), col_size)]
 
     context = {
         'col_list': col_list,
@@ -73,7 +63,7 @@ def conjugation(request, infinitive):
 
 
 def search(request):
-    search_query = request.GET['q']
+    search_query = request.GET.get('q')
     if search_query:
         try:
             verb = Verb.objects.get(infinitive__iexact=search_query)
@@ -85,10 +75,9 @@ def search(request):
             return render(request, 'conjugator/search_result.html', context)
         return redirect(reverse('conjugation', kwargs={'infinitive':verb.infinitive}))
     else:
-        return redirect(reverse('home'))
+        raise Http404()
 
 
 def autocomplete(request):
-    verb_list = Verb.objects.order_by('frequency').values('infinitive')
-    autocomplete_list = [verb['infinitive'] for verb in verb_list]
+    autocomplete_list = list(Verb.objects.values_list('infinitive', flat=True))
     return JsonResponse(autocomplete_list, safe=False)

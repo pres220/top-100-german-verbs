@@ -8,6 +8,9 @@ class Verb(models.Model):
     present_participle = models.CharField(max_length=30, blank=True)
     past_participle = models.CharField(max_length=30, blank=True)
 
+    class Meta:
+        ordering = ['frequency']
+
     def __str__(self):
         return self.infinitive
 

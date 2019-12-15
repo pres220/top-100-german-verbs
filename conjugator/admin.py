@@ -12,7 +12,6 @@ class ConjugationAdmin(admin.ModelAdmin):
 
 class VerbAdmin(admin.ModelAdmin):
     list_display = ('infinitive', 'frequency', 'translation')
-    ordering = ['frequency']
     search_fields = ['infinitive']
     inlines = [ConjugationInline]
 

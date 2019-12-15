@@ -454,10 +454,9 @@ class ConjugationViewTest(TestCase):
 
 class SearchViewTest(ConjugationViewTest):
 
-    def test_empty_search_query_redirect(self):
+    def test_empty_search_query_raises_404(self):
         response = self.client.get(reverse('search'), {'q':''} )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('home'))
+        self.assertEqual(response.status_code, 404)
 
     def test_lowercase_search_query_redirect(self):
         response = self.client.get(reverse('search'), {'q':'test_infinitive'})
