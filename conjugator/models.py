@@ -27,7 +27,7 @@ class Tense(models.Model):
 
 
 class Conjugation(models.Model):
-    infinitive = models.ForeignKey(Verb, on_delete=models.CASCADE)
+    verb = models.ForeignKey(Verb, on_delete=models.CASCADE)
     mood = models.ForeignKey(Mood, on_delete=models.CASCADE)
     tense = models.ForeignKey(Tense, on_delete=models.CASCADE)
     ich = models.CharField(max_length=30, blank=True)
@@ -39,8 +39,8 @@ class Conjugation(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['infinitive', 'mood', 'tense'], name='unique_conjugation')
+            models.UniqueConstraint(fields=['verb', 'mood', 'tense'], name='unique_conjugation')
         ]
 
     def __str__(self):
-        return f'{self.infinitive} {self.mood} {self.tense}'
+        return f'{self.verb} {self.mood} {self.tense}'

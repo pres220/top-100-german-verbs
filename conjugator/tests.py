@@ -65,7 +65,7 @@ class ConjugationModelTest(TestCase):
         tense = Tense.objects.create(name='test_tense')
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=mood,
             tense=tense,
             ich='test_ich',
@@ -80,8 +80,8 @@ class ConjugationModelTest(TestCase):
         conjugation = Conjugation.objects.get(pk=1)
         self.assertTrue(isinstance(conjugation, Conjugation))
         self.assertEqual(conjugation.__str__(),
-            f'{conjugation.infinitive.infinitive} {conjugation.mood.name} {conjugation.tense.name}')
-        self.assertEqual(conjugation.infinitive.infinitive, 'test_infinitive')
+            f'{conjugation.verb.infinitive} {conjugation.mood.name} {conjugation.tense.name}')
+        self.assertEqual(conjugation.verb.infinitive, 'test_infinitive')
         self.assertEqual(conjugation.mood.name, 'test_mood')
         self.assertEqual(conjugation.tense.name, 'test_tense')
         self.assertEqual(conjugation.ich, 'test_ich')
@@ -97,7 +97,7 @@ class ConjugationModelTest(TestCase):
         tense = Tense.objects.get(name='test_tense')
         with self.assertRaises(IntegrityError):
             Conjugation.objects.create(
-                infinitive=verb,
+                verb=verb,
                 mood=mood,
                 tense=tense,
                 ich='test_ich2',
@@ -166,7 +166,7 @@ class ConjugationViewTest(TestCase):
         future_perfect = Tense.objects.create(name='future perfect')
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=indicative,
             tense=present,
             ich='indicative_present_ich',
@@ -178,7 +178,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=indicative,
             tense=perfect,
             ich='indicative_perfect_ich',
@@ -190,7 +190,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=indicative,
             tense=preterite,
             ich='indicative_preterite_ich',
@@ -202,7 +202,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=indicative,
             tense=plusquamperfect,
             ich='indicative_plusquamperfect_ich',
@@ -214,7 +214,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=indicative,
             tense=future,
             ich='indicative_future_ich',
@@ -226,7 +226,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=indicative,
             tense=future_perfect,
             ich='indicative_future_perfect_ich',
@@ -238,7 +238,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_I,
             tense=present,
             ich='subjunctive_I_present_ich',
@@ -250,7 +250,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_I,
             tense=perfect,
             ich='subjunctive_I_perfect_ich',
@@ -262,7 +262,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_I,
             tense=future,
             ich='subjunctive_I_future_ich',
@@ -274,7 +274,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_I,
             tense=future_perfect,
             ich='subjunctive_I_future_perfect_ich',
@@ -286,7 +286,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_II,
             tense=preterite,
             ich='subjunctive_II_preterite_ich',
@@ -298,7 +298,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_II,
             tense=plusquamperfect,
             ich='subjunctive_II_plusquamperfect_ich',
@@ -310,7 +310,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_II,
             tense=future,
             ich='subjunctive_II_future_ich',
@@ -322,7 +322,7 @@ class ConjugationViewTest(TestCase):
         )
 
         Conjugation.objects.create(
-            infinitive=verb,
+            verb=verb,
             mood=subjunctive_II,
             tense=future_perfect,
             ich='subjunctive_II_future_perfect_ich',

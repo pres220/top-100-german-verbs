@@ -8,7 +8,7 @@ class ConjugationInline(admin.StackedInline):
 
 class ConjugationAdmin(admin.ModelAdmin):
     ordering = ['id']
-    search_fields = ['infinitive__infinitive']
+    search_fields = ['verb__infinitive']
 
 class VerbAdmin(admin.ModelAdmin):
     list_display = ('infinitive', 'frequency', 'translation')

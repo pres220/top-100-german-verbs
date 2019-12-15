@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from .models import Verb, Conjugation
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
+from django.urls import reverse
 
 
 def home(request):
@@ -32,7 +33,7 @@ def conjugation(request, infinitive):
     prev_frequency = verb.frequency - 1 if verb.frequency > 1 else Verb.objects.count()
     next_verb = Verb.objects.get(frequency=next_frequency).infinitive
     prev_verb = Verb.objects.get(frequency=prev_frequency).infinitive
-    conjugations = Conjugation.objects.filter(infinitive=verb)
+    conjugations = Conjugation.objects.filter(verb=verb)
     indicative_present = conjugations.get(mood__name='indicative', tense__name='present')
     indicative_perfect = conjugations.get(mood__name='indicative', tense__name='perfect')
     indicative_preterite = conjugations.get(mood__name='indicative', tense__name='preterite')
@@ -82,9 +83,9 @@ def search(request):
                 'page_title': 'Search failed | Top 100 German Verbs'
             }
             return render(request, 'conjugator/search_result.html', context)
-        return redirect(f'/verb/{verb.infinitive}/')
+        return redirect(reverse('conjugation', kwargs={'infinitive':verb.infinitive}))
     else:
-        return redirect('/')
+        return redirect(reverse('home'))
 
 
 def autocomplete(request):
