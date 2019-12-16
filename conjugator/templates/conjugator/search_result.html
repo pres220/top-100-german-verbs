@@ -1,7 +1,9 @@
 {% extends 'conjugator/base.html' %}
 
+{% block title %}Search failed | {% endblock title %}
+
 {% block content %}
 <div class="container">
-  <h4 class="result-msg text-center">No verb found matching the query '{{ search_query }}'.<br>Click here to return <a href="/">Home</a>.</h4>
+  <h4 class="result-msg text-center">No verb found matching the query '{{ search_query }}'.</h4>
 </div>
 {% endblock content %}

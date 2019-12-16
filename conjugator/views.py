@@ -11,7 +11,6 @@ def home(request):
 
     context = {
         'col_list': col_list,
-        'page_title': 'Top 100 German Verbs',
         'brand': 'Top 100 German Verbs'
     }
     return render(request, 'conjugator/home.html', context)
@@ -73,7 +72,7 @@ def search(request):
                 'page_title': 'Search failed | Top 100 German Verbs'
             }
             return render(request, 'conjugator/search_result.html', context)
-        return redirect(reverse('conjugation', kwargs={'infinitive':verb.infinitive}))
+        return redirect(reverse('conjugation', kwargs={'infinitive': verb.infinitive}))
     else:
         raise Http404()
 

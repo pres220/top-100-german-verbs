@@ -8,11 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'conjugator/style.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'conjugator/auto-complete.css' %}">
     <link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}">
-    <title>
-      {% block title %}
-      {{ page_title }}
-      {% endblock title %}
-    </title>
+    <title>{% block title %}{% endblock title %}Top 100 German Verbs</title>
   </head>
   <body>
     <nav class="navbar navbar-expand-sm navbar-dark bg-info">

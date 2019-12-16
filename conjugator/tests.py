@@ -1,29 +1,18 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.db.utils import IntegrityError
-from django.urls import reverse
+from django.urls import reverse, resolve
 from .models import Verb, Mood, Tense, Conjugation
+from . import views
 
 
 class VerbModelTest(TestCase):
 
     def setUp(self):
-        Verb.objects.create(
-            infinitive='test_infinitive',
-            frequency=1,
-            translation='test_translation',
-            present_participle='test_present_participle',
-            past_participle='test_past_participle',
-        )
+        Verb.objects.create(infinitive='test_infinitive', frequency=1)
 
-    def test_fields(self):
+    def test_verb_model_str(self):
         verb = Verb.objects.get(infinitive='test_infinitive')
-        self.assertTrue(isinstance(verb, Verb))
         self.assertEqual(verb.__str__(), verb.infinitive)
-        self.assertEqual(verb.infinitive, 'test_infinitive')
-        self.assertEqual(verb.frequency, 1)
-        self.assertEqual(verb.translation, 'test_translation')
-        self.assertEqual(verb.present_participle, 'test_present_participle')
-        self.assertEqual(verb.past_participle, 'test_past_participle')
 
 
 class MoodModelTest(TestCase):
@@ -31,11 +20,9 @@ class MoodModelTest(TestCase):
     def setUp(self):
         Mood.objects.create(name='test_name')
 
-    def test_name(self):
+    def test_mood_model_str(self):
         mood = Mood.objects.get(name='test_name')
-        self.assertTrue(isinstance(mood, Mood))
         self.assertEqual(mood.__str__(), mood.name)
-        self.assertEqual(mood.name, 'test_name')
 
 
 class TenseModelTest(TestCase):
@@ -43,110 +30,118 @@ class TenseModelTest(TestCase):
     def setUp(self):
         Tense.objects.create(name='test_name')
 
-    def test_name(self):
+    def test_tense_model_str(self):
         tense = Tense.objects.get(name='test_name')
-        self.assertTrue(isinstance(tense, Tense))
         self.assertEqual(tense.__str__(), tense.name)
-        self.assertEqual(tense.name, 'test_name')
 
 
 class ConjugationModelTest(TestCase):
 
-    def setUp(self):
-        verb = Verb.objects.create(
-            infinitive='test_infinitive',
-            frequency=1,
-            translation='test_translation',
-            present_participle='test_present_participle',
-            past_participle='test_past_participle',
-        )
-
+    @classmethod
+    def setUpTestData(cls):
+        verb = Verb.objects.create(infinitive='test_infinitive', frequency=1)
         mood = Mood.objects.create(name='test_mood')
         tense = Tense.objects.create(name='test_tense')
+        Conjugation.objects.create(verb=verb, mood=mood, tense=tense)
 
-        Conjugation.objects.create(
-            verb=verb,
-            mood=mood,
-            tense=tense,
-            ich='test_ich',
-            du='test_du',
-            er='test_er',
-            wir='test_wir',
-            ihr='test_ihr',
-            sie='test_sie'
-        )
-
-    def test_fields(self):
+    def test_conjugation_model_str(self):
         conjugation = Conjugation.objects.get(pk=1)
-        self.assertTrue(isinstance(conjugation, Conjugation))
         self.assertEqual(conjugation.__str__(),
             f'{conjugation.verb.infinitive} {conjugation.mood.name} {conjugation.tense.name}')
-        self.assertEqual(conjugation.verb.infinitive, 'test_infinitive')
-        self.assertEqual(conjugation.mood.name, 'test_mood')
-        self.assertEqual(conjugation.tense.name, 'test_tense')
-        self.assertEqual(conjugation.ich, 'test_ich')
-        self.assertEqual(conjugation.du, 'test_du')
-        self.assertEqual(conjugation.er, 'test_er')
-        self.assertEqual(conjugation.wir, 'test_wir')
-        self.assertEqual(conjugation.ihr, 'test_ihr')
-        self.assertEqual(conjugation.sie, 'test_sie')
 
     def test_unique_constraint(self):
         verb = Verb.objects.get(infinitive='test_infinitive')
         mood = Mood.objects.get(name='test_mood')
         tense = Tense.objects.get(name='test_tense')
         with self.assertRaises(IntegrityError):
-            Conjugation.objects.create(
-                verb=verb,
-                mood=mood,
-                tense=tense,
-                ich='test_ich2',
-                du='test_du2',
-                er='test_er2',
-                wir='test_wir2',
-                ihr='test_ihr2',
-                sie='test_sie2'
-            )
+            Conjugation.objects.create(verb=verb, mood=mood, tense=tense)
 
 
 class HomeViewTest(TestCase):
 
-    def setUp(self):
-        for i in range(1, 12):
-            Verb.objects.create(
-                infinitive=f'test_infinitive{i}',
-                frequency=i,
-            )
+    @classmethod
+    def setUpTestData(cls):
+        Verb.objects.create(infinitive=f'test_infinitive1', frequency=1)
 
-    def test_home_page(self):
+    def setUp(self):
+        self.response = self.client.get(reverse('home'))
+
+    def create_x_verbs(self, stop):
+        for i in range(2, stop + 1):
+            Verb.objects.create(infinitive=f'test_infinitive{i}', frequency=i)
+
+    def home_view_renders_verbs(self):
         response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'conjugator/home.html')
-        for i in range(1, 12):
-            self.assertContains(response, f'test_infinitive{i}')
+        verbs = Verb.objects.all()
+        for i in range(verbs.count()):
+            self.assertContains(response, f'<span class="badge">{verbs[i].frequency}</span>')
+            self.assertContains(response, f'{verbs[i].infinitive}')
+
+    def test_home_url_resolves_to_home_view(self):
+        view = resolve('/')
+        self.assertEqual(view.func, views.home)
+
+    def test_home_view_success_status_code(self):
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_home_view_uses_home_template(self):
+        self.assertTemplateUsed(self.response, 'conjugator/home.html')
+
+    def test_home_view_brand_rendering(self):
+        self.assertContains(self.response, 'Top 100 German Verbs</a>')
+
+    def test_home_view_brand_links_to_home(self):
+        self.assertContains(self.response, f'href=\"{reverse("home")}\"')
+
+    def test_home_view_search_form_action_url_links_to_search(self):
+        self.assertContains(self.response, f'action="{reverse("search")}"')
+
+    def test_home_view_title(self):
+        self.assertContains(self.response, '<title>Top 100 German Verbs</title>')
+
+    def test_home_view_renders_1_verb(self):
+        self.home_view_renders_verbs()
+
+    def test_home_view_renders_15_verbs(self):
+        self.create_x_verbs(15)
+        self.home_view_renders_verbs()
+
+    def test_home_view_renders_100_verbs(self):
+        self.create_x_verbs(100)
+        self.home_view_renders_verbs()
 
 
 class AutocompleteViewTest(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         for i in range(1, 101):
-            Verb.objects.create(
-                infinitive=f'test_infinitive{i}',
-                frequency=i,
-            )
+            Verb.objects.create(infinitive=f'test_infinitive{i}', frequency=i)
 
-    def test_autocomplete_json(self):
-        response = self.client.get(reverse('autocomplete'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), Verb.objects.count())
-        for i in range(1, 101):
-            self.assertEqual(response.json()[i-1], f'test_infinitive{i}')
+    def setUp(self):
+        self.response = self.client.get(reverse('autocomplete'))
+
+    def test_autocomplete_url_resolves_to_autocomplete_view(self):
+        view = resolve('/autocomplete/')
+        self.assertEqual(view.func, views.autocomplete)
+
+    def test_autocomplete_view_success_status_code(self):
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_autocomplete_view_renders_all_rows(self):
+        self.assertEqual(len(self.response.json()), Verb.objects.count())
+
+    def test_autocomplete_view_renders_json_correctly(self):
+        verbs = Verb.objects.all()
+        for i in range(verbs.count()):
+            self.assertEqual(self.response.json()[i], f'{verbs[i].infinitive}')
 
 
 class ConjugationViewTest(TestCase):
 
-    def setUp(self):
-        verb = Verb.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.verb = Verb.objects.create(
             infinitive='test_infinitive',
             frequency=1,
             translation='test_translation',
@@ -157,7 +152,6 @@ class ConjugationViewTest(TestCase):
         indicative = Mood.objects.create(name='indicative')
         subjunctive_I = Mood.objects.create(name='subjunctive I')
         subjunctive_II = Mood.objects.create(name='subjunctive II')
-
         present = Tense.objects.create(name='present')
         perfect = Tense.objects.create(name='perfect')
         preterite = Tense.objects.create(name='preterite')
@@ -165,8 +159,8 @@ class ConjugationViewTest(TestCase):
         future = Tense.objects.create(name='future')
         future_perfect = Tense.objects.create(name='future perfect')
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.indicative_present = Conjugation.objects.create(
+            verb=cls.verb,
             mood=indicative,
             tense=present,
             ich='indicative_present_ich',
@@ -177,8 +171,8 @@ class ConjugationViewTest(TestCase):
             sie='indicative_present_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.indicative_perfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=indicative,
             tense=perfect,
             ich='indicative_perfect_ich',
@@ -189,8 +183,8 @@ class ConjugationViewTest(TestCase):
             sie='indicative_perfect_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.indicative_preterite = Conjugation.objects.create(
+            verb=cls.verb,
             mood=indicative,
             tense=preterite,
             ich='indicative_preterite_ich',
@@ -201,8 +195,8 @@ class ConjugationViewTest(TestCase):
             sie='indicative_preterite_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.indicative_plusquamperfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=indicative,
             tense=plusquamperfect,
             ich='indicative_plusquamperfect_ich',
@@ -213,8 +207,8 @@ class ConjugationViewTest(TestCase):
             sie='indicative_plusquamperfect_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.indicative_future = Conjugation.objects.create(
+            verb=cls.verb,
             mood=indicative,
             tense=future,
             ich='indicative_future_ich',
@@ -225,8 +219,8 @@ class ConjugationViewTest(TestCase):
             sie='indicative_future_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.indicative_future_perfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=indicative,
             tense=future_perfect,
             ich='indicative_future_perfect_ich',
@@ -237,8 +231,8 @@ class ConjugationViewTest(TestCase):
             sie='indicative_future_perfect_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_I_present = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_I,
             tense=present,
             ich='subjunctive_I_present_ich',
@@ -249,8 +243,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_I_present_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_I_perfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_I,
             tense=perfect,
             ich='subjunctive_I_perfect_ich',
@@ -261,8 +255,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_I_perfect_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_I_future = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_I,
             tense=future,
             ich='subjunctive_I_future_ich',
@@ -273,8 +267,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_I_future_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_I_future_perfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_I,
             tense=future_perfect,
             ich='subjunctive_I_future_perfect_ich',
@@ -285,8 +279,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_I_future_perfect_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_II_preterite = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_II,
             tense=preterite,
             ich='subjunctive_II_preterite_ich',
@@ -297,8 +291,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_II_preterite_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_II_plusquamperfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_II,
             tense=plusquamperfect,
             ich='subjunctive_II_plusquamperfect_ich',
@@ -309,8 +303,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_II_plusquamperfect_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_II_future = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_II,
             tense=future,
             ich='subjunctive_II_future_ich',
@@ -321,8 +315,8 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_II_future_sie'
         )
 
-        Conjugation.objects.create(
-            verb=verb,
+        cls.subjunctive_II_future_perfect = Conjugation.objects.create(
+            verb=cls.verb,
             mood=subjunctive_II,
             tense=future_perfect,
             ich='subjunctive_II_future_perfect_ich',
@@ -333,145 +327,178 @@ class ConjugationViewTest(TestCase):
             sie='subjunctive_II_future_perfect_sie'
         )
 
-    def test_detail_page_not_created_for_nonexisting_verb(self):
-        url = reverse('conjugation', kwargs={'infinitive':'does_not_exist'})
+        cls.client = Client()
+        cls.url = reverse('conjugation', kwargs={'infinitive': f'{cls.verb.infinitive}'})
+        cls.response = cls.client.get(cls.url)
+
+
+    def test_conjugation_url_resolves_to_conjugation_view(self):
+        view = resolve(self.url)
+        self.assertEqual(view.func, views.conjugation)
+
+    def test_conjugation_view_not_found_status_code(self):
+        url = reverse('conjugation', kwargs={'infinitive': 'does_not_exist'})
         no_response = self.client.get(url)
         self.assertEqual(no_response.status_code, 404)
 
-    def test_detail_page_created_for_existing_verb(self):
-        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'conjugator/conjugation.html')
+    def test_conjugation_view_success_status_code(self):
+        self.assertEqual(self.response.status_code, 200)
 
-    def test_detail_page_contains_conjugation(self):
-        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
-        response = self.client.get(url)
-        self.assertContains(response, 'test_infinitive')
-        self.assertContains(response, '1st')
-        self.assertContains(response, 'test_translation')
-        self.assertContains(response, 'test_present_participle')
-        self.assertContains(response, 'test_past_participle')
+    def test_conjugation_view_uses_conjugation_template(self):
+        self.assertTemplateUsed(self.response, 'conjugator/conjugation.html')
 
-        self.assertContains(response, 'indicative_present_ich')
-        self.assertContains(response, 'indicative_present_du')
-        self.assertContains(response, 'indicative_present_er')
-        self.assertContains(response, 'indicative_present_wir')
-        self.assertContains(response, 'indicative_present_ihr')
-        self.assertContains(response, 'indicative_present_sie')
+    def test_conjugation_view_renders_brand(self):
+        self.assertContains(self.response, 'Home')
 
-        self.assertContains(response, 'indicative_perfect_ich')
-        self.assertContains(response, 'indicative_perfect_du')
-        self.assertContains(response, 'indicative_perfect_er')
-        self.assertContains(response, 'indicative_perfect_wir')
-        self.assertContains(response, 'indicative_perfect_ihr')
-        self.assertContains(response, 'indicative_perfect_sie')
+    def test_conjugation_page_title(self):
+        self.assertContains(self.response, f'{self.verb.infinitive} conjugation | Top 100 German Verbs')
 
-        self.assertContains(response, 'indicative_preterite_ich')
-        self.assertContains(response, 'indicative_preterite_du')
-        self.assertContains(response, 'indicative_preterite_er')
-        self.assertContains(response, 'indicative_preterite_wir')
-        self.assertContains(response, 'indicative_preterite_ihr')
-        self.assertContains(response, 'indicative_preterite_sie')
+    def test_conjugation_page_contains_verb_conjugation(self):
+        self.assertContains(self.response, self.verb.infinitive)
+        self.assertContains(self.response, self.verb.frequency)
+        self.assertContains(self.response, self.verb.translation)
+        self.assertContains(self.response, self.verb.present_participle)
+        self.assertContains(self.response, self.verb.past_participle)
 
-        self.assertContains(response, 'indicative_plusquamperfect_ich')
-        self.assertContains(response, 'indicative_plusquamperfect_du')
-        self.assertContains(response, 'indicative_plusquamperfect_er')
-        self.assertContains(response, 'indicative_plusquamperfect_wir')
-        self.assertContains(response, 'indicative_plusquamperfect_ihr')
-        self.assertContains(response, 'indicative_plusquamperfect_sie')
+        self.assertContains(self.response, self.indicative_present.ich)
+        self.assertContains(self.response, self.indicative_present.du)
+        self.assertContains(self.response, self.indicative_present.er)
+        self.assertContains(self.response, self.indicative_present.wir)
+        self.assertContains(self.response, self.indicative_present.ihr)
+        self.assertContains(self.response, self.indicative_present.sie)
 
-        self.assertContains(response, 'indicative_future_ich')
-        self.assertContains(response, 'indicative_future_du')
-        self.assertContains(response, 'indicative_future_er')
-        self.assertContains(response, 'indicative_future_wir')
-        self.assertContains(response, 'indicative_future_ihr')
-        self.assertContains(response, 'indicative_future_sie')
+        self.assertContains(self.response, self.indicative_perfect.ich)
+        self.assertContains(self.response, self.indicative_perfect.du)
+        self.assertContains(self.response, self.indicative_perfect.er)
+        self.assertContains(self.response, self.indicative_perfect.wir)
+        self.assertContains(self.response, self.indicative_perfect.ihr)
+        self.assertContains(self.response, self.indicative_perfect.sie)
 
-        self.assertContains(response, 'indicative_future_perfect_ich')
-        self.assertContains(response, 'indicative_future_perfect_du')
-        self.assertContains(response, 'indicative_future_perfect_er')
-        self.assertContains(response, 'indicative_future_perfect_wir')
-        self.assertContains(response, 'indicative_future_perfect_ihr')
-        self.assertContains(response, 'indicative_future_perfect_sie')
+        self.assertContains(self.response, self.indicative_preterite.ich)
+        self.assertContains(self.response, self.indicative_preterite.du)
+        self.assertContains(self.response, self.indicative_preterite.er)
+        self.assertContains(self.response, self.indicative_preterite.wir)
+        self.assertContains(self.response, self.indicative_preterite.ihr)
+        self.assertContains(self.response, self.indicative_preterite.sie)
 
-        self.assertContains(response, 'subjunctive_I_present_ich')
-        self.assertContains(response, 'subjunctive_I_present_du')
-        self.assertContains(response, 'subjunctive_I_present_er')
-        self.assertContains(response, 'subjunctive_I_present_wir')
-        self.assertContains(response, 'subjunctive_I_present_ihr')
-        self.assertContains(response, 'subjunctive_I_present_sie')
+        self.assertContains(self.response, self.indicative_plusquamperfect.ich)
+        self.assertContains(self.response, self.indicative_plusquamperfect.du)
+        self.assertContains(self.response, self.indicative_plusquamperfect.er)
+        self.assertContains(self.response, self.indicative_plusquamperfect.wir)
+        self.assertContains(self.response, self.indicative_plusquamperfect.ihr)
+        self.assertContains(self.response, self.indicative_plusquamperfect.sie)
 
-        self.assertContains(response, 'subjunctive_I_perfect_ich')
-        self.assertContains(response, 'subjunctive_I_perfect_du')
-        self.assertContains(response, 'subjunctive_I_perfect_er')
-        self.assertContains(response, 'subjunctive_I_perfect_wir')
-        self.assertContains(response, 'subjunctive_I_perfect_ihr')
-        self.assertContains(response, 'subjunctive_I_perfect_sie')
+        self.assertContains(self.response, self.indicative_future.ich)
+        self.assertContains(self.response, self.indicative_future.du)
+        self.assertContains(self.response, self.indicative_future.er)
+        self.assertContains(self.response, self.indicative_future.wir)
+        self.assertContains(self.response, self.indicative_future.ihr)
+        self.assertContains(self.response, self.indicative_future.sie)
 
-        self.assertContains(response, 'subjunctive_I_future_ich')
-        self.assertContains(response, 'subjunctive_I_future_du')
-        self.assertContains(response, 'subjunctive_I_future_er')
-        self.assertContains(response, 'subjunctive_I_future_wir')
-        self.assertContains(response, 'subjunctive_I_future_ihr')
-        self.assertContains(response, 'subjunctive_I_future_sie')
+        self.assertContains(self.response, self.indicative_future_perfect.ich)
+        self.assertContains(self.response, self.indicative_future_perfect.du)
+        self.assertContains(self.response, self.indicative_future_perfect.er)
+        self.assertContains(self.response, self.indicative_future_perfect.wir)
+        self.assertContains(self.response, self.indicative_future_perfect.ihr)
+        self.assertContains(self.response, self.indicative_future_perfect.sie)
 
-        self.assertContains(response, 'subjunctive_I_future_perfect_ich')
-        self.assertContains(response, 'subjunctive_I_future_perfect_du')
-        self.assertContains(response, 'subjunctive_I_future_perfect_er')
-        self.assertContains(response, 'subjunctive_I_future_perfect_wir')
-        self.assertContains(response, 'subjunctive_I_future_perfect_ihr')
-        self.assertContains(response, 'subjunctive_I_future_perfect_sie')
+        self.assertContains(self.response, self.subjunctive_I_present.ich)
+        self.assertContains(self.response, self.subjunctive_I_present.du)
+        self.assertContains(self.response, self.subjunctive_I_present.er)
+        self.assertContains(self.response, self.subjunctive_I_present.wir)
+        self.assertContains(self.response, self.subjunctive_I_present.ihr)
+        self.assertContains(self.response, self.subjunctive_I_present.sie)
 
-        self.assertContains(response, 'subjunctive_II_preterite_ich')
-        self.assertContains(response, 'subjunctive_II_preterite_du')
-        self.assertContains(response, 'subjunctive_II_preterite_er')
-        self.assertContains(response, 'subjunctive_II_preterite_wir')
-        self.assertContains(response, 'subjunctive_II_preterite_ihr')
-        self.assertContains(response, 'subjunctive_II_preterite_sie')
+        self.assertContains(self.response, self.subjunctive_I_perfect.ich)
+        self.assertContains(self.response, self.subjunctive_I_perfect.du)
+        self.assertContains(self.response, self.subjunctive_I_perfect.er)
+        self.assertContains(self.response, self.subjunctive_I_perfect.wir)
+        self.assertContains(self.response, self.subjunctive_I_perfect.ihr)
+        self.assertContains(self.response, self.subjunctive_I_perfect.sie)
 
-        self.assertContains(response, 'subjunctive_II_plusquamperfect_ich')
-        self.assertContains(response, 'subjunctive_II_plusquamperfect_du')
-        self.assertContains(response, 'subjunctive_II_plusquamperfect_er')
-        self.assertContains(response, 'subjunctive_II_plusquamperfect_wir')
-        self.assertContains(response, 'subjunctive_II_plusquamperfect_ihr')
-        self.assertContains(response, 'subjunctive_II_plusquamperfect_sie')
+        self.assertContains(self.response, self.subjunctive_I_future.ich)
+        self.assertContains(self.response, self.subjunctive_I_future.du)
+        self.assertContains(self.response, self.subjunctive_I_future.er)
+        self.assertContains(self.response, self.subjunctive_I_future.wir)
+        self.assertContains(self.response, self.subjunctive_I_future.ihr)
+        self.assertContains(self.response, self.subjunctive_I_future.sie)
 
-        self.assertContains(response, 'subjunctive_II_future_ich')
-        self.assertContains(response, 'subjunctive_II_future_du')
-        self.assertContains(response, 'subjunctive_II_future_er')
-        self.assertContains(response, 'subjunctive_II_future_wir')
-        self.assertContains(response, 'subjunctive_II_future_ihr')
-        self.assertContains(response, 'subjunctive_II_future_sie')
+        self.assertContains(self.response, self.subjunctive_I_future_perfect.ich)
+        self.assertContains(self.response, self.subjunctive_I_future_perfect.du)
+        self.assertContains(self.response, self.subjunctive_I_future_perfect.er)
+        self.assertContains(self.response, self.subjunctive_I_future_perfect.wir)
+        self.assertContains(self.response, self.subjunctive_I_future_perfect.ihr)
+        self.assertContains(self.response, self.subjunctive_I_future_perfect.sie)
 
-        self.assertContains(response, 'subjunctive_II_future_perfect_ich')
-        self.assertContains(response, 'subjunctive_II_future_perfect_du')
-        self.assertContains(response, 'subjunctive_II_future_perfect_er')
-        self.assertContains(response, 'subjunctive_II_future_perfect_wir')
-        self.assertContains(response, 'subjunctive_II_future_perfect_ihr')
-        self.assertContains(response, 'subjunctive_II_future_perfect_sie')
+        self.assertContains(self.response, self.subjunctive_II_preterite.ich)
+        self.assertContains(self.response, self.subjunctive_II_preterite.du)
+        self.assertContains(self.response, self.subjunctive_II_preterite.er)
+        self.assertContains(self.response, self.subjunctive_II_preterite.wir)
+        self.assertContains(self.response, self.subjunctive_II_preterite.ihr)
+        self.assertContains(self.response, self.subjunctive_II_preterite.sie)
+
+        self.assertContains(self.response, self.subjunctive_II_plusquamperfect.ich)
+        self.assertContains(self.response, self.subjunctive_II_plusquamperfect.du)
+        self.assertContains(self.response, self.subjunctive_II_plusquamperfect.er)
+        self.assertContains(self.response, self.subjunctive_II_plusquamperfect.wir)
+        self.assertContains(self.response, self.subjunctive_II_plusquamperfect.ihr)
+        self.assertContains(self.response, self.subjunctive_II_plusquamperfect.sie)
+
+        self.assertContains(self.response, self.subjunctive_II_future.ich)
+        self.assertContains(self.response, self.subjunctive_II_future.du)
+        self.assertContains(self.response, self.subjunctive_II_future.er)
+        self.assertContains(self.response, self.subjunctive_II_future.wir)
+        self.assertContains(self.response, self.subjunctive_II_future.ihr)
+        self.assertContains(self.response, self.subjunctive_II_future.sie)
+
+        self.assertContains(self.response, self.subjunctive_II_future_perfect.ich)
+        self.assertContains(self.response, self.subjunctive_II_future_perfect.du)
+        self.assertContains(self.response, self.subjunctive_II_future_perfect.er)
+        self.assertContains(self.response, self.subjunctive_II_future_perfect.wir)
+        self.assertContains(self.response, self.subjunctive_II_future_perfect.ihr)
+        self.assertContains(self.response, self.subjunctive_II_future_perfect.sie)
 
 
 class SearchViewTest(ConjugationViewTest):
 
-    def test_empty_search_query_raises_404(self):
-        response = self.client.get(reverse('search'), {'q':''} )
+    def test_search_view_url_resolves_to_search_view(self):
+        view = resolve('/search/')
+        self.assertEqual(view.func, views.search)
+
+    def test_search_view_raises_404_with_empty_search_query(self):
+        response = self.client.get(reverse('search'), {'q': ''} )
         self.assertEqual(response.status_code, 404)
 
-    def test_lowercase_search_query_redirect(self):
-        response = self.client.get(reverse('search'), {'q':'test_infinitive'})
+    def test_search_view_redirect_status_code(self):
+        response = self.client.get(reverse('search'), {'q': self.verb.infinitive})
         self.assertEqual(response.status_code, 302)
-        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
+
+    def test_search_view_redirects_to_conjugation_url_with_lowercase_query(self):
+        response = self.client.get(reverse('search'), {'q': self.verb.infinitive})
+        url = reverse('conjugation', kwargs={'infinitive': self.verb.infinitive})
         self.assertRedirects(response, url)
 
-    def test_nonlowercase_search_query_redirect(self):
-        response = self.client.get(reverse('search'), {'q':'Test_Infinitive'})
-        self.assertEqual(response.status_code, 302)
-        url = reverse('conjugation', kwargs={'infinitive':'test_infinitive'})
+    def test_search_view_redirects_to_conjugation_url_with_non_lowercase_query(self):
+        response = self.client.get(reverse('search'), {'q': 'Test_Infinitive'})
+        url = reverse('conjugation', kwargs={'infinitive': self.verb.infinitive})
         self.assertRedirects(response, url)
 
-    def test_search_query_does_not_exist(self):
-        response = self.client.get(reverse('search'), {'q':'does_not_exist'})
+    def test_search_view_search_result_status_code(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
         self.assertEqual(response.status_code, 200)
+
+    def test_search_view_uses_search_result_template(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
         self.assertTemplateUsed(response, 'conjugator/search_result.html')
+
+    def test_search_view_content_rendering(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
         self.assertContains(response, 'does_not_exist')
+
+    def test_search_view_brand_rendering(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
+        self.assertContains(response, 'Home')
+
+    def test_search_view_page_title(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
+        self.assertContains(response, 'Search failed | Top 100 German Verbs')
