@@ -1,7 +1,12 @@
 {% extends 'conjugator/base.html' %}
 
+{% block brand %}Top 100 German Verbs{% endblock brand%}
+
 {% block content %}
 <div class="container">
+  {% for message in messages %}
+  <div class="alert alert-danger text-center">{{ message }}</div>
+  {% endfor %}
   <div class="alert alert-primary">
     <h4 class="text-center">Welcome to Top 100 German Verbs!</h4>
     <hr>
@@ -24,4 +29,5 @@
     {% endfor %}
   </div>
 </div>
+
 {% endblock content %}

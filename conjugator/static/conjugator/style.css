@@ -1,18 +1,22 @@
+.alert-danger {
+  font-weight: bold;
+}
+
 body {
   background-color: #fafaff;
 }
 
 .card {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   background-color: #fafaff;
 }
 
 .conjugation-header {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .navbar {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .result-msg {

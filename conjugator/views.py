@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, Http404
 from django.urls import reverse
+from django.contrib import messages
 from .models import Verb, Conjugation
 
 
@@ -8,12 +9,7 @@ def home(request):
     verbs = Verb.objects.values('infinitive', 'frequency')
     col_size = 10
     col_list = [verbs[i: i+col_size] for i in range(0, verbs.count(), col_size)]
-
-    context = {
-        'col_list': col_list,
-        'brand': 'Top 100 German Verbs'
-    }
-    return render(request, 'conjugator/home.html', context)
+    return render(request, 'conjugator/home.html', {'col_list': col_list})
 
 
 def conjugation(request, infinitive):
@@ -56,7 +52,6 @@ def conjugation(request, infinitive):
         'subjunctive_II_plusquamperfect': subjunctive_II_plusquamperfect,
         'subjunctive_II_future': subjunctive_II_future,
         'subjunctive_II_future_perfect': subjunctive_II_future_perfect,
-        'page_title': f'{verb.infinitive} conjugation | Top 100 German Verbs'
     }
     return render(request, 'conjugator/conjugation.html', context)
 
@@ -67,11 +62,8 @@ def search(request):
         try:
             verb = Verb.objects.get(infinitive__iexact=search_query)
         except Verb.DoesNotExist:
-            context = {
-                'search_query': search_query,
-                'page_title': 'Search failed | Top 100 German Verbs'
-            }
-            return render(request, 'conjugator/search_result.html', context)
+            messages.error(request, f"No verb found matching {search_query}. Please try again.")
+            return redirect('home')
         return redirect(reverse('conjugation', kwargs={'infinitive': verb.infinitive}))
     else:
         raise Http404()

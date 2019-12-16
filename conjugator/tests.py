@@ -483,22 +483,19 @@ class SearchViewTest(ConjugationViewTest):
         url = reverse('conjugation', kwargs={'infinitive': self.verb.infinitive})
         self.assertRedirects(response, url)
 
-    def test_search_view_search_result_status_code(self):
-        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
+    def test_search_view_redirected_to_home_view_success_status_code(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'}, follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_search_view_uses_search_result_template(self):
-        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
-        self.assertTemplateUsed(response, 'conjugator/search_result.html')
+    def test_search_view_redirected_to_home_view_using_home_template(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'}, follow=True)
+        self.assertTemplateUsed(response, 'conjugator/home.html')
 
-    def test_search_view_content_rendering(self):
-        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
-        self.assertContains(response, 'does_not_exist')
+    def test_search_view_error_message_available_to_home_view(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'}, follow=True)
+        message = list(response.context.get('messages'))[0]
+        self.assertEqual(message.message, 'No verb found matching does_not_exist. Please try again.')
 
-    def test_search_view_brand_rendering(self):
-        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
-        self.assertContains(response, 'Home')
-
-    def test_search_view_page_title(self):
-        response = self.client.get(reverse('search'), {'q': 'does_not_exist'})
-        self.assertContains(response, 'Search failed | Top 100 German Verbs')
+    def test_search_view_error_message_rendered_after_redirect(self):
+        response = self.client.get(reverse('search'), {'q': 'does_not_exist'}, follow=True)
+        self.assertContains(response, 'No verb found matching does_not_exist. Please try again.')
