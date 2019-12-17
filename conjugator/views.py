@@ -6,6 +6,10 @@ from .models import Verb, Conjugation
 
 
 def home(request):
+    """
+    Renders home.html with a list of lists with each list representing a
+    Bootstrap column 10 verbs long.
+    """
     verbs = Verb.objects.values('infinitive', 'frequency')
     col_size = 10
     col_list = [verbs[i: i+col_size] for i in range(0, verbs.count(), col_size)]
@@ -13,6 +17,9 @@ def home(request):
 
 
 def conjugation(request, infinitive):
+    """
+    Renders conjugation.html with the current verb's conjugation pattern.
+    """
     verb = get_object_or_404(Verb, infinitive__iexact=infinitive)
     next_frequency = verb.frequency + 1 if verb.frequency < Verb.objects.count() else 1
     prev_frequency = verb.frequency - 1 if verb.frequency > 1 else Verb.objects.count()
@@ -57,6 +64,11 @@ def conjugation(request, infinitive):
 
 
 def search(request):
+    """
+    Searches the Verb table for a verb matching the search query. If a match is
+    found redirects to the conjugation view. Otherwise redirects to home with an
+    error message.
+    """
     search_query = request.GET.get('q')
     if search_query:
         try:
@@ -70,5 +82,9 @@ def search(request):
 
 
 def autocomplete(request):
+    """
+    Creates a list of all infinitives and renders as JSON to be consumed by the
+    the third party autocomplete feature (auto-complete.js).
+    """
     autocomplete_list = list(Verb.objects.values_list('infinitive', flat=True))
     return JsonResponse(autocomplete_list, safe=False)
