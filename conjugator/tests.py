@@ -494,8 +494,8 @@ class SearchViewTest(ConjugationViewTest):
     def test_search_view_error_message_available_to_home_view(self):
         response = self.client.get(reverse('search'), {'q': 'does_not_exist'}, follow=True)
         message = list(response.context.get('messages'))[0]
-        self.assertEqual(message.message, 'No verb found matching does_not_exist. Please try again.')
+        self.assertEqual(message.message, 'No verb found matching search query. Please try again.')
 
     def test_search_view_error_message_rendered_after_redirect(self):
         response = self.client.get(reverse('search'), {'q': 'does_not_exist'}, follow=True)
-        self.assertContains(response, 'No verb found matching does_not_exist. Please try again.')
+        self.assertContains(response, 'No verb found matching search query. Please try again.')

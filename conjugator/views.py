@@ -62,7 +62,7 @@ def search(request):
         try:
             verb = Verb.objects.get(infinitive__iexact=search_query)
         except Verb.DoesNotExist:
-            messages.error(request, f"No verb found matching {search_query}. Please try again.")
+            messages.error(request, f"No verb found matching search query. Please try again.")
             return redirect('home')
         return redirect(reverse('conjugation', kwargs={'infinitive': verb.infinitive}))
     else:

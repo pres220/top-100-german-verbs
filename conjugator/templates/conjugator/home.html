@@ -5,13 +5,18 @@
 {% block content %}
 <div class="container">
   {% for message in messages %}
-  <div class="alert alert-danger text-center">{{ message }}</div>
+  <div class="alert alert-danger alert-dismissable fade show text-center">
+    <button type="button" class="close" data-dismiss="alert">
+      <span>&times;</span>
+    </button>
+    {{ message }}
+  </div>
   {% endfor %}
   <div class="alert alert-primary">
     <h4 class="text-center">Welcome to Top 100 German Verbs!</h4>
     <hr>
     <p>Below is the list of the 100 most commonly used German verbs according to
-      <a class="alert-link" href="https://www.amazon.com/Frequency-Dictionary-German-Vocabulary-Dictionaries/dp/0415316332">A Frequency Dictionary of German</a>. Click any link below or use the search box above to see a verb's conjugation pattern.
+      <a class="alert-link" href="https://www.amazon.com/Frequency-Dictionary-German-Vocabulary-Dictionaries/dp/0415316332">A Frequency Dictionary of German</a>. Click any link below or use the search box above to view any verb's conjugation pattern.
     </p>
   </div>
   <div class="row no-gutters">
@@ -29,5 +34,4 @@
     {% endfor %}
   </div>
 </div>
-
 {% endblock content %}

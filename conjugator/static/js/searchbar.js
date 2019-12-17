@@ -7,11 +7,6 @@ document.querySelector('.search-bar').addEventListener('mousedown', (e) => {
   }
 });
 
-document.querySelector('.navbar-toggler').addEventListener('click', () => {
-  document.querySelector("#navbarNav").classList.toggle('collapse');
-});
-
-
 const verbAutoComplete = new autoComplete({
     selector: 'input[id="search"]',
     source: function(term, suggest) {
