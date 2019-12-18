@@ -1,0 +1,1 @@
+web: gunicorn german_verb_project.wsgi --log-file -
