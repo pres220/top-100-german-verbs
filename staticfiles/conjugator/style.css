@@ -1,0 +1,24 @@
+.alert-danger {
+  font-weight: bold;
+}
+
+body {
+  background-color: #fafaff;
+}
+
+.card {
+  margin-bottom: 15px;
+  background-color: #fafaff;
+}
+
+.conjugation-header {
+  margin-bottom: 15px;
+}
+
+.navbar {
+  margin-bottom: 15px;
+}
+
+ul {
+  list-style-type: none;
+}
