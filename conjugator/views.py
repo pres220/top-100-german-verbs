@@ -12,7 +12,7 @@ def home(request):
     """
     verbs = Verb.objects.values('infinitive', 'frequency')
     col_size = 10
-    col_list = [verbs[i: i+col_size] for i in range(0, verbs.count(), col_size)]
+    col_list = [verbs[i:i+col_size] for i in range(0, verbs.count(), col_size)]
     return render(request, 'conjugator/home.html', {'col_list': col_list})
 
 

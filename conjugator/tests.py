@@ -47,7 +47,7 @@ class ConjugationModelTest(TestCase):
     def test_conjugation_model_str(self):
         conjugation = Conjugation.objects.get(pk=1)
         self.assertEqual(conjugation.__str__(),
-            f'{conjugation.verb.infinitive} {conjugation.mood.name} {conjugation.tense.name}')
+                         f'{conjugation.verb.infinitive} {conjugation.mood.name} {conjugation.tense.name}')
 
     def test_unique_constraint(self):
         verb = Verb.objects.get(infinitive='test_infinitive')
@@ -331,7 +331,6 @@ class ConjugationViewTest(TestCase):
         cls.url = reverse('conjugation', kwargs={'infinitive': f'{cls.verb.infinitive}'})
         cls.response = cls.client.get(cls.url)
 
-
     def test_conjugation_url_resolves_to_conjugation_view(self):
         view = resolve(self.url)
         self.assertEqual(view.func, views.conjugation)
@@ -466,7 +465,7 @@ class SearchViewTest(ConjugationViewTest):
         self.assertEqual(view.func, views.search)
 
     def test_search_view_raises_404_with_empty_search_query(self):
-        response = self.client.get(reverse('search'), {'q': ''} )
+        response = self.client.get(reverse('search'), {'q': ''})
         self.assertEqual(response.status_code, 404)
 
     def test_search_view_redirect_status_code(self):
