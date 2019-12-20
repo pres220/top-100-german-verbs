@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Verb, Mood, Tense, Conjugation
+
+from .models import Conjugation, Mood, Tense, Verb
 
 
 class ConjugationInline(admin.StackedInline):

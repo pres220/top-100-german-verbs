@@ -7,6 +7,7 @@ verify_ssl = true
 pep8 = "*"
 pylint = "*"
 flake8 = "*"
+isort = "*"
 
 [packages]
 django = "==3.0"

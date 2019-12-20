@@ -1,8 +1,9 @@
-from django.test import TestCase, Client
 from django.db.utils import IntegrityError
-from django.urls import reverse, resolve
-from .models import Verb, Mood, Tense, Conjugation
+from django.test import Client, TestCase
+from django.urls import resolve, reverse
+
 from . import views
+from .models import Conjugation, Mood, Tense, Verb
 
 
 class VerbModelTest(TestCase):

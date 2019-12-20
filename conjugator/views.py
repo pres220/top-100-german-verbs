@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, Http404
-from django.urls import reverse
 from django.contrib import messages
-from .models import Verb, Conjugation
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from .models import Conjugation, Verb
 
 
 def home(request):
