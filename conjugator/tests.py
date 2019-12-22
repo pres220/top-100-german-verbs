@@ -154,7 +154,7 @@ class ConjugationViewTest(TestCase):
         subjunctive_I = Mood.objects.create(name='subjunctive I')
         subjunctive_II = Mood.objects.create(name='subjunctive II')
         present = Tense.objects.create(name='present')
-        perfect = Tense.objects.create(name='perfect')
+        perfect = Tense.objects.create(name='present perfect')
         preterite = Tense.objects.create(name='preterite')
         plusquamperfect = Tense.objects.create(name='plusquamperfect')
         future = Tense.objects.create(name='future')
