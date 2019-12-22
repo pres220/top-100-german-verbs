@@ -84,9 +84,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>
-                    {{ verb.frequency | ordinal }}
-                  </td>
+                  <td>{{ verb.frequency|ordinal }}</td>
                 </tr>
               </tbody>
           </table>
@@ -95,523 +93,53 @@
     </div>
   </div>
 
-  <!-- Indicative Mood Conjugations -->
+  {% for mood in conjugations_grouped_by_mood %}
+  {% cycle 'Indicative' 'Subjunctive I' 'Subjunctive II' as mood_name silent %}
+  {% cycle 'col-xl-4' 'col-xl-3' 'col-xl-3' as xl_col_class silent %}
   <div class="card border-info">
-    <h4 class="card-header bg-info text-white text-center">Indicative</h4>
+    <h4 class="card-header bg-info text-white text-center">{{ mood_name }}</h4>
     <div class="card-body">
       <div class="row">
-        <div class="col-sm-6 col-md-6 col-xl-4">
+        {% for conjugation in mood %}
+        <div class="col-sm-6 col-md-6 {{ xl_col_class }}">
           <table class="table table-striped table-bordered table-hover">
             <thead class="thead-dark">
               <tr>
-                <th colspan="2">Present</th>
+                <th colspan="2">{{ conjugation.tense.name|title }}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <th>ich</th>
-                <td>{{ indicative_present.ich }}</td>
+                <td>{{ conjugation.ich }}</td>
               </tr>
               <tr>
                 <th>du</th>
-                <td>{{ indicative_present.du }}</td>
+                <td>{{ conjugation.du }}</td>
               </tr>
               <tr>
                 <th>er/sie/es</th>
-                <td>{{ indicative_present.er }}</td>
+                <td>{{ conjugation.er }}</td>
               </tr>
               <tr>
                 <th>wir</th>
-                <td>{{ indicative_present.wir }}</td>
+                <td>{{ conjugation.wir }}</td>
               </tr>
               <tr>
                 <th>ihr</th>
-                <td>{{ indicative_present.ihr }}</td>
+                <td>{{ conjugation.ihr }}</td>
               </tr>
               <tr>
                 <th>sie/Sie</th>
-                <td>{{ indicative_present.sie }}</td>
+                <td>{{ conjugation.sie }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="col-sm-6 col-md-6 col-xl-4">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Preterite</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ indicative_preterite.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ indicative_preterite.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ indicative_preterite.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ indicative_preterite.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ indicative_preterite.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ indicative_preterite.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-4">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Present Perfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ indicative_perfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ indicative_perfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ indicative_perfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ indicative_perfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ indicative_perfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ indicative_perfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-4">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Plusquamperfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ indicative_plusquamperfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ indicative_plusquamperfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ indicative_plusquamperfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ indicative_plusquamperfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ indicative_plusquamperfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ indicative_plusquamperfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-4">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Future</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ indicative_future.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ indicative_future.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ indicative_future.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ indicative_future.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ indicative_future.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ indicative_future.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-4">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Future Perfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ indicative_future_perfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ indicative_future_perfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ indicative_future_perfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ indicative_future_perfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ indicative_future_perfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ indicative_future_perfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
-
-  <!-- Subjunctive I Mood Conjugations -->
-
-  <div class="card border-info">
-    <h4 class="card-header bg-info text-white text-center">Subjunctive I</h4>
-    <div class="card-body bg-light">
-      <div class="row">
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Present</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_I_present.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_I_present.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_I_present.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_I_present.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_I_present.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_I_present.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Present Perfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_I_perfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_I_perfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_I_perfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_I_perfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_I_perfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_I_perfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Future</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_I_future.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_I_future.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_I_future.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_I_future.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_I_future.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_I_future.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Future Perfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_I_future_perfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_I_future_perfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_I_future_perfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_I_future_perfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_I_future_perfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_I_future_perfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Subjunctive II Mood Conjugations -->
-
-  <div class="card border-info">
-    <h4 class="card-header bg-info text-white text-center">Subjunctive II</h4>
-    <div class="card-body bg-light">
-      <div class="row">
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Preterite</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_II_preterite.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_II_preterite.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_II_preterite.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_II_preterite.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_II_preterite.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_II_preterite.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Plusquamperfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_II_plusquamperfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_II_plusquamperfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_II_plusquamperfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_II_plusquamperfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_II_plusquamperfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_II_plusquamperfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Future</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_II_future.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_II_future.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_II_future.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_II_future.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_II_future.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_II_future.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6 col-md-6 col-xl-3">
-          <table class="table table-striped table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th colspan="2">Future Perfect</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>ich</th>
-                <td>{{ subjunctive_II_future_perfect.ich }}</td>
-              </tr>
-              <tr>
-                <th>du</th>
-                <td>{{ subjunctive_II_future_perfect.du }}</td>
-              </tr>
-              <tr>
-                <th>er/sie/es</th>
-                <td>{{ subjunctive_II_future_perfect.er }}</td>
-              </tr>
-              <tr>
-                <th>wir</th>
-                <td>{{ subjunctive_II_future_perfect.wir }}</td>
-              </tr>
-              <tr>
-                <th>ihr</th>
-                <td>{{ subjunctive_II_future_perfect.ihr }}</td>
-              </tr>
-              <tr>
-                <th>sie/Sie</th>
-                <td>{{ subjunctive_II_future_perfect.sie }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% endfor %}
 </div>
 {% endblock content %}

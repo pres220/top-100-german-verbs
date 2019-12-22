@@ -26,41 +26,18 @@ def conjugation(request, infinitive):
     prev_frequency = verb.frequency - 1 if verb.frequency > 1 else Verb.objects.count()
     next_verb = Verb.objects.get(frequency=next_frequency).infinitive
     prev_verb = Verb.objects.get(frequency=prev_frequency).infinitive
-    conjugations = Conjugation.objects.filter(verb=verb)
-    indicative_present = conjugations.get(mood__name='indicative', tense__name='present')
-    indicative_perfect = conjugations.get(mood__name='indicative', tense__name='perfect')
-    indicative_preterite = conjugations.get(mood__name='indicative', tense__name='preterite')
-    indicative_plusquamperfect = conjugations.get(mood__name='indicative', tense__name='plusquamperfect')
-    indicative_future = conjugations.get(mood__name='indicative', tense__name='future')
-    indicative_future_perfect = conjugations.get(mood__name='indicative', tense__name='future perfect')
-    subjunctive_I_present = conjugations.get(mood__name='subjunctive I', tense__name='present')
-    subjunctive_I_perfect = conjugations.get(mood__name='subjunctive I', tense__name='perfect')
-    subjunctive_I_future = conjugations.get(mood__name='subjunctive I', tense__name='future')
-    subjunctive_I_future_perfect = conjugations.get(mood__name='subjunctive I', tense__name='future perfect')
-    subjunctive_II_preterite = conjugations.get(mood__name='subjunctive II', tense__name='preterite')
-    subjunctive_II_plusquamperfect = conjugations.get(mood__name='subjunctive II', tense__name='plusquamperfect')
-    subjunctive_II_future = conjugations.get(mood__name='subjunctive II', tense__name='future')
-    subjunctive_II_future_perfect = conjugations.get(mood__name='subjunctive II', tense__name='future perfect')
-
+    conjugations = Conjugation.objects.filter(verb=verb).select_related('mood', 'tense').order_by('id')
+    indicative = conjugations.filter(mood__name='indicative')
+    subjunctive_I = conjugations.filter(mood__name='subjunctive I')
+    subjunctive_II = conjugations.filter(mood__name='subjunctive II')
+    conjugations_grouped_by_mood = [indicative, subjunctive_I, subjunctive_II]
     context = {
         'verb': verb,
         'next_verb': next_verb,
         'prev_verb': prev_verb,
-        'indicative_present': indicative_present,
-        'indicative_perfect': indicative_perfect,
-        'indicative_preterite': indicative_preterite,
-        'indicative_plusquamperfect': indicative_plusquamperfect,
-        'indicative_future': indicative_future,
-        'indicative_future_perfect': indicative_future_perfect,
-        'subjunctive_I_present': subjunctive_I_present,
-        'subjunctive_I_perfect': subjunctive_I_perfect,
-        'subjunctive_I_future': subjunctive_I_future,
-        'subjunctive_I_future_perfect': subjunctive_I_future_perfect,
-        'subjunctive_II_preterite': subjunctive_II_preterite,
-        'subjunctive_II_plusquamperfect': subjunctive_II_plusquamperfect,
-        'subjunctive_II_future': subjunctive_II_future,
-        'subjunctive_II_future_perfect': subjunctive_II_future_perfect,
+        'conjugations_grouped_by_mood': conjugations_grouped_by_mood
     }
+
     return render(request, 'conjugator/conjugation.html', context)
 
 

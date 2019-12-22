@@ -8,6 +8,7 @@ pep8 = "*"
 pylint = "*"
 flake8 = "*"
 isort = "*"
+django-debug-toolbar = "*"
 
 [packages]
 django = "==3.0"
