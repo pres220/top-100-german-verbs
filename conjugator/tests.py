@@ -62,7 +62,7 @@ class HomeViewTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        Verb.objects.create(infinitive=f'test_infinitive1', frequency=1)
+        Verb.objects.create(infinitive='test_infinitive1', frequency=1)
 
     def setUp(self):
         self.response = self.client.get(reverse('home'))

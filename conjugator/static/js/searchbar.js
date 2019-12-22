@@ -12,7 +12,7 @@ const verbAutoComplete = new autoComplete({
     source: function(term, suggest) {
         const xhr = new XMLHttpRequest();
         const url = location.origin + '/autocomplete';
-        xhr.open('GET', url, true)
+        xhr.open('GET', url, true);
         xhr.responseType = 'json';
         xhr.onreadystatechange = function() {
             if (this.readyState === 4 && this.status === 200) {
