@@ -12,6 +12,10 @@ class ConjugationAdmin(admin.ModelAdmin):
     ordering = ['id']
     search_fields = ['verb__infinitive']
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('verb', 'mood', 'tense')
+
 
 class VerbAdmin(admin.ModelAdmin):
     list_display = ('infinitive', 'frequency', 'translation')
