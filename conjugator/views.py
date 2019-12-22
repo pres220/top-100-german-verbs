@@ -37,7 +37,6 @@ def conjugation(request, infinitive):
         'prev_verb': prev_verb,
         'conjugations_grouped_by_mood': conjugations_grouped_by_mood
     }
-
     return render(request, 'conjugator/conjugation.html', context)
 
 
