@@ -1,2 +1,3 @@
 staticfiles/* linguist-generated
 conjugator/static/css/auto-complete.css linguist-vendored
+conjugator/static/js/auto-complete.js linguist-vendored
