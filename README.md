@@ -2,11 +2,12 @@
 
 A simple Django web app inspired by websites such as [Verbix](https://www.verbix.com/languages/german.html) and [Reverso](http://conjugator.reverso.net/conjugation-german.html) that displays conjugation tables for the 100 most frequently used German verbs.
 
-## Visit Website
+## Preview
 The web app is deployed at the following Heroku site:
+
 https://top-100-german-verbs.herokuapp.com
 
-## Installation
+## Install
 Clone the project, install the dependencies, and create a virtual environment
 ```bash
 git clone https://github.com/pres220/top-100-german-verbs.git
